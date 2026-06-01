@@ -539,14 +539,14 @@ function weeklyCard(h,ws){
     dots += `<button class="wdot ${on?'on':''} ${future?'future':''}" ${bg} onclick="event.stopPropagation();tap('${h.id}','${ymd(d)}',null)">${DOW[d.getDay()][0]}</button>`;
   }
   const met = cnt>=target;
-  return `<button class="hcard press" onclick="openHabitSheet('${h.id}')">
+  return `<div class="hcard press" onclick="openHabitSheet('${h.id}')">
       <div class="emoji">${h.icon}</div>
       <div class="body">
         <div class="name">${esc(h.name)}</div>
         <div class="weekdots">${dots}</div>
       </div>
       <div class="wprog" style="color:${met?h.color:'var(--ink2)'}">${cnt}/${target}</div>
-    </button>`;
+    </div>`;
 }
 function setView(v){ view=v; renderHabits(); }
 function pickDate(s){ selDate=parseYmd(s); renderHabits(); }
