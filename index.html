@@ -104,8 +104,8 @@
   @keyframes burst{0%{transform:scale(1);}40%{transform:scale(1.28);}100%{transform:scale(1);}}
 
   /* weekly mini-week dots */
-  .weekdots{display:flex;gap:7px;margin-top:9px;}
-  .wdot{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ink2);background:#f1f1f5;transition:all .15s;}
+  .weekdots{display:flex;gap:4px;margin-top:9px;}
+  .wdot{flex:1;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ink2);background:#f1f1f5;transition:all .15s;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
   .wdot.on{color:#fff;}
   .wdot.future{opacity:.4;}
   .wprog{font-size:14px;font-weight:800;margin-left:auto;}
@@ -218,6 +218,9 @@
   .toggle.on::after{left:23px;}
 
   .delrow{padding:14px 16px;color:#ff3b30;font-weight:700;text-align:center;}
+
+  /* Touch / cursor fixes for interactive non-button elements */
+  .hcard,.dcell,.dcell .dnum,.circbtn,.chip,.daychip,.srow.tap,.fpick,.toggle,.fab,.colorgrid button,.emojigrid button{cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
   .toast{position:absolute;left:50%;bottom:calc(var(--safe-bot) + 110px);transform:translateX(-50%) translateY(20px);background:rgba(28,28,30,.92);color:#fff;padding:11px 20px;border-radius:14px;font-size:14px;font-weight:600;opacity:0;transition:all .3s;z-index:80;pointer-events:none;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   select.nat{font-family:inherit;font-size:16px;border:none;background:var(--card);padding:14px 16px;border-radius:14px;box-shadow:var(--shadow-soft);width:100%;color:var(--ink);-webkit-appearance:none;outline:none;}
