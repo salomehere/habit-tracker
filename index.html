@@ -84,7 +84,7 @@
 
   /* ---------- habit cards ---------- */
   .list{padding:8px 18px 130px;display:flex;flex-direction:column;gap:13px;}
-  .hcard{position:relative;display:flex;align-items:center;gap:14px;background:var(--card);border-radius:var(--r);padding:16px 14px 16px 16px;box-shadow:var(--shadow);overflow:hidden;transition:transform .12s ease;}
+  .hcard{position:relative;display:flex;align-items:center;gap:14px;background:var(--card);border-radius:var(--r);padding:16px 14px 16px 16px;box-shadow:var(--shadow);overflow:hidden;transition:transform .12s ease;width:100%;text-align:left;}
   .hcard:active{transform:scale(.985);}
   .hcard .accent{position:absolute;left:0;top:10px;bottom:10px;width:5px;border-radius:3px;}
   .hcard.done{color:#fff;}
@@ -96,7 +96,7 @@
   .hcard .sub{font-size:14px;color:var(--ink2);margin-top:3px;display:flex;align-items:center;gap:5px;}
   .hcard .flame{color:var(--orange);font-weight:800;}
   .hcard.done .flame{color:#fff;}
-  .check{flex:0 0 auto;width:42px;height:42px;border-radius:50%;border:2px solid var(--ink3);display:flex;align-items:center;justify-content:center;transition:all .18s;background:transparent;}
+  .check{flex:0 0 auto;width:42px;height:42px;border-radius:50%;border:2px solid var(--ink3);display:flex;align-items:center;justify-content:center;transition:all .18s;background:transparent;padding:0;cursor:pointer;touch-action:manipulation;}
   .check svg{width:22px;height:22px;stroke:var(--ink3);stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:stroke .18s;}
   .hcard.done .check{border-color:rgba(255,255,255,.85);background:rgba(255,255,255,.22);}
   .hcard.done .check svg{stroke:#fff;}
@@ -227,7 +227,7 @@
   input[type=date].nat{font-family:inherit;font-size:16px;border:none;background:var(--card);padding:14px 16px;border-radius:14px;box-shadow:var(--shadow-soft);color:var(--ink);width:100%;outline:none;}
 </style>
 </head>
-<body>
+<body onclick="void(0)">
 <div id="app">
   <div id="screen" class="scroll"></div>
 
@@ -513,7 +513,7 @@ function dailyCard(h,date){
   const sub = streak>0
       ? `<span class="flame">🔥 ${streak}</span>`
       : `<span>Let's start</span>`;
-  return `<div class="hcard ${done?'done':''} press" ${style} onclick="tap('${h.id}','${ymd(date)}',this)">
+  return `<button class="hcard ${done?'done':''} press" ${style} onclick="tap('${h.id}','${ymd(date)}',this)">
       ${accent}
       <div class="emoji">${h.icon}</div>
       <div class="body">
@@ -523,7 +523,7 @@ function dailyCard(h,date){
       <div class="check" data-check>
         <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"></polyline></svg>
       </div>
-    </div>`;
+    </button>`;
 }
 function weeklyCard(h,ws){
   const target = h.mode==="weekly" ? h.target : (h.mode==="weekdays"? h.days.length : 7);
@@ -536,17 +536,17 @@ function weeklyCard(h,ws){
     const future = d > new Date(new Date().setHours(23,59,59,999));
     const due = h.mode==="weekdays"? h.days.includes(d.getDay()) : true;
     const bg = on? `style="background:${h.color}"` : "";
-    dots += `<div class="wdot ${on?'on':''} ${future?'future':''}" ${bg} onclick="event.stopPropagation();tap('${h.id}','${ymd(d)}',null)">${DOW[d.getDay()][0]}</div>`;
+    dots += `<button class="wdot ${on?'on':''} ${future?'future':''}" ${bg} onclick="event.stopPropagation();tap('${h.id}','${ymd(d)}',null)">${DOW[d.getDay()][0]}</button>`;
   }
   const met = cnt>=target;
-  return `<div class="hcard press" onclick="openHabitSheet('${h.id}')">
+  return `<button class="hcard press" onclick="openHabitSheet('${h.id}')">
       <div class="emoji">${h.icon}</div>
       <div class="body">
         <div class="name">${esc(h.name)}</div>
         <div class="weekdots">${dots}</div>
       </div>
       <div class="wprog" style="color:${met?h.color:'var(--ink2)'}">${cnt}/${target}</div>
-    </div>`;
+    </button>`;
 }
 function setView(v){ view=v; renderHabits(); }
 function pickDate(s){ selDate=parseYmd(s); renderHabits(); }
