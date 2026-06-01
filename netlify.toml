@@ -1,0 +1,11 @@
+# Netlify config — Habits (single static page, no build step)
+
+[build]
+  publish = "."
+
+# Always revalidate index.html so a new commit shows up immediately
+# (your saved habit data lives in the browser, not the file, so it's untouched)
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
