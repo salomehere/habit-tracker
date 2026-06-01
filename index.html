@@ -136,7 +136,8 @@
   .calnav button{width:36px;height:36px;font-size:20px;color:var(--ink);display:flex;align-items:center;justify-content:center;}
   .caldow{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:11px;color:var(--ink2);font-weight:600;margin-bottom:6px;}
   .calgrid{display:grid;grid-template-columns:repeat(7,1fr);row-gap:5px;}
-  .cday{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;margin:auto;color:var(--ink);}
+  .cday-cell{display:flex;align-items:center;justify-content:center;padding:2px 0;}
+  .cday{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--ink);}
   .cday.empty{visibility:hidden;}
   .cday.l0{background:var(--hair);color:var(--ink2);}
   .cday.l1{background:#dcecf8;}
@@ -606,10 +607,10 @@ function monthCal(){
   const y=calMonth.getFullYear(), m=calMonth.getMonth();
   const first=new Date(y,m,1), lead=first.getDay(), days=new Date(y,m+1,0).getDate();
   let g="";
-  for(let i=0;i<lead;i++) g+=`<div class="cday empty"></div>`;
+  for(let i=0;i<lead;i++) g+=`<div class="cday-cell"><div class="cday empty"></div></div>`;
   for(let d=1;d<=days;d++){
     const date=new Date(y,m,d);
-    g+=`<div class="cday ${levelForDay(date)}">${d}</div>`;
+    g+=`<div class="cday-cell"><div class="cday ${levelForDay(date)}">${d}</div></div>`;
   }
   return `<div class="calwrap fade-in">
       <div class="calnav">
