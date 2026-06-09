@@ -7,6 +7,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Habits">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="shortcut icon" href="icon.png">
 <meta name="theme-color" content="#F2F2F7">
 <title>Habits</title>
 <style>
@@ -847,11 +849,18 @@ function setScope(s){ progScope=s; closeSheetForce(); renderProgress(); }
 /* ---------- VACATIONS ---------- */
 function openVacations(){
   let list = db.vacations.length ? db.vacations.map(v=>{
-    const names = v.habitIds.length? v.habitIds.map(id=>db.habits.find(h=>h.id===id)?.icon||"").join(" ") : "All paused? none selected";
+    const names = v.habitIds.length? v.habitIds.map(id=>{ const h=db.habits.find(h=>h.id===id); return h?h.icon+""+h.name:""; }).join(", ") : "—";
     return `<div class="vac-item">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
-          <div><div class="vt">${esc(v.name||"Holiday")}</div><div class="vd">${fmt(v.start)} → ${fmt(v.end)}</div><div class="vd">Pausing: ${names||"—"}</div></div>
-          <div onclick="removeVac('${v.id}')" style="color:#ff3b30;font-weight:700;font-size:14px;padding:4px 8px">Remove</div>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+          <div style="flex:1;min-width:0">
+            <div class="vt">${esc(v.name||"Holiday")}</div>
+            <div class="vd">${fmt(v.start)} → ${fmt(v.end)}</div>
+            <div class="vd" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Pausing: ${esc(names)}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex:0 0 auto">
+            <button onclick="openEditVac('${v.id}')" style="color:var(--blue);font-weight:700;font-size:14px;padding:4px 8px;border:none;background:none;font-family:inherit;cursor:pointer">Edit</button>
+            <button onclick="removeVac('${v.id}')" style="color:#ff3b30;font-weight:700;font-size:14px;padding:4px 8px;border:none;background:none;font-family:inherit;cursor:pointer">Remove</button>
+          </div>
         </div>
       </div>`;
   }).join("") : `<div class="empty" style="padding:30px"><div class="big">🏝️</div>No vacations yet</div>`;
@@ -864,11 +873,23 @@ function openVacations(){
 let vacDraft=null;
 function openNewVac(){
   vacDraft={ id:"v"+Date.now(), name:"", start:todayYmd(), end:ymd(addDays(new Date(),7)), habitIds:[] };
-  renderNewVac();
+  renderVacForm();
 }
-function renderNewVac(){
-  const habs = db.habits.filter(h=>!h.archived).map(h=>`<div class="srow tap" onclick="toggleVacHabit('${h.id}')"><div class="ic" style="font-size:22px">${h.icon}</div><div class="t">${esc(h.name)}</div><div class="chev" style="color:var(--blue)">${vacDraft.habitIds.includes(h.id)?'✓':''}</div></div>`).join("");
-  const html=`<div class="sheethead"><div class="circbtn press" onclick="openVacations()">‹</div><div class="stitle">New Vacation</div><div class="circbtn done press" onclick="saveVac()">✓</div></div>
+function openEditVac(id){
+  const v=db.vacations.find(v=>v.id===id);
+  if(!v) return;
+  vacDraft=JSON.parse(JSON.stringify(v));
+  renderVacForm();
+}
+function renderVacForm(){
+  const isEdit = db.vacations.some(v=>v.id===vacDraft.id);
+  const habs = db.habits.filter(h=>!h.archived).map(h=>`
+    <button onclick="toggleVacHabit('${h.id}')" style="display:flex;align-items:center;gap:13px;width:100%;padding:15px 16px;border:none;background:none;font-family:inherit;cursor:pointer;border-bottom:1px solid var(--hair);text-align:left;">
+      <div style="font-size:22px;width:24px;text-align:center">${h.icon}</div>
+      <div style="flex:1;font-size:16px;font-weight:600;color:var(--ink)">${esc(h.name)}</div>
+      <div style="color:var(--blue);font-size:18px;font-weight:700">${vacDraft.habitIds.includes(h.id)?'✓':''}</div>
+    </button>`).join("");
+  const html=`<div class="sheethead"><div class="circbtn press" onclick="openVacations()">‹</div><div class="stitle">${isEdit?"Edit":"New"} Vacation</div><div class="circbtn done press" onclick="saveVac()">✓</div></div>
     <div class="sheetbody">
       <div class="label">Name</div>
       <input class="txt" placeholder="e.g. NYC trip" value="${esc(vacDraft.name)}" oninput="vacDraft.name=this.value">
@@ -880,18 +901,21 @@ function renderNewVac(){
       <input type="date" class="nat" value="${vacDraft.end}" onchange="vacDraft.end=this.value">
       <div style="height:18px"></div>
       <div class="label">Habits to pause</div>
-      <div class="sgroup" style="margin:0">${habs||'<div class="srow"><div class="t muted">No habits</div></div>'}</div>
+      <div class="sgroup" style="margin:0;overflow:hidden">${habs||'<div class="srow"><div class="t muted">No habits</div></div>'}</div>
+      ${isEdit?`<button class="bigbtn danger" style="margin-top:16px" onclick="removeVac('${vacDraft.id}')">Delete vacation</button>`:""}
       <div style="height:30px"></div>
     </div>`;
   showSheet(html,true);
 }
-function toggleVacHabit(id){ const a=vacDraft.habitIds; const k=a.indexOf(id); if(k>=0)a.splice(k,1);else a.push(id); renderNewVac(); }
+function toggleVacHabit(id){ const a=vacDraft.habitIds; const k=a.indexOf(id); if(k>=0)a.splice(k,1);else a.push(id); renderVacForm(); }
 function saveVac(){
   if(vacDraft.end<vacDraft.start){ toast("End date is before start"); return; }
   if(vacDraft.habitIds.length===0){ toast("Pick habits to pause"); return; }
-  db.vacations.push(vacDraft); saveDB(); vacDraft=null; openVacations(); toast("Vacation saved");
+  const idx=db.vacations.findIndex(v=>v.id===vacDraft.id);
+  if(idx>=0) db.vacations[idx]=vacDraft; else db.vacations.push(vacDraft);
+  saveDB(); vacDraft=null; openVacations(); toast("Vacation saved");
 }
-function removeVac(id){ db.vacations=db.vacations.filter(v=>v.id!==id); saveDB(); openVacations(); }
+function removeVac(id){ db.vacations=db.vacations.filter(v=>v.id!==id); saveDB(); closeSheetForce(); openVacations(); }
 
 /* ---------- IMPORT / EXPORT ---------- */
 function openImport(){
